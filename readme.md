@@ -1,5 +1,9 @@
 # OtakuGifs - Random anime gif in MOTD
 
+<p align="center" width="100%">
+  <img src="https://dev-cs.ru/data/resource_icons/1/1594.jpg?1685095563">
+</p>
+
 Getting a random ANIME GIF in MOTD!
 
 ## Credits
