@@ -17,27 +17,37 @@ new const OTAKU_REACTIONS[][] = {
 }
 
 new const OTAKU_URL[] = "https://api.otakugifs.xyz/gif"
+new const GIF_COMMAND[] = "/gif"
 
 const Float: ANTISPAM_TIME = 10.0
 
 new Float: g_lastPlayerUse[MAX_PLAYERS + 1]
 
 public plugin_init() {
-  register_plugin("OtakuGIFs", "1.0.0", "ufame")
+  register_plugin("OtakuGIFs", "1.0.1", "ufame")
 
-  register_clcmd("say /gif", "commandGif")
+  register_clcmd("say", "commandGif")
+  register_clcmd("say_team", "commandGif")
 }
 
 public commandGif(id) {
+  new args[32]
+  read_argv(1, args, charsmax(args))
+
+  if (!equal(args, GIF_COMMAND, 4))
+    return PLUGIN_CONTINUE
+
   if ((g_lastPlayerUse[id] + ANTISPAM_TIME) > get_gametime())
     return PLUGIN_HANDLED
 
   new EzHttpOptions: httpOptions = ezhttp_create_options()
 
-  new randomReaction = random_num(0, charsmax(OTAKU_REACTIONS))
+  //getting reaction by name or random if no match found
+  trim(args[4])
+  new reactionId = GetReactionId(args[4])
 
   ezhttp_option_set_header(httpOptions, "Content-Type", "application/json")
-  ezhttp_option_add_url_parameter(httpOptions, "reaction", OTAKU_REACTIONS[randomReaction])
+  ezhttp_option_add_url_parameter(httpOptions, "reaction", OTAKU_REACTIONS[reactionId])
 
   new JSON: userObject = json_init_object()
   json_object_set_string(userObject, "id", fmt("%d", id))
@@ -123,3 +133,11 @@ showUserMotd(const id, const gifAddress[]) {
   show_motd(id, motdMessage, "UWU")
 }
 
+GetReactionId(const reaction[]) {
+  for (new reactionId = 0; reactionId < sizeof OTAKU_REACTIONS; reactionId++) {
+    if (equali(reaction, OTAKU_REACTIONS[reactionId]))
+      return reactionId
+  }
+
+  return random_num(0, sizeof OTAKU_REACTIONS - 1)
+}
